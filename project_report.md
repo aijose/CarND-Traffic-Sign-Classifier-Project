@@ -181,7 +181,22 @@ My final model consisted of the following layers:
 
 #### 3. Describe how you trained your model. The discussion can include the type of optimizer, the batch size, number of epochs and any hyperparameters such as learning rate.
 
-To train the model, I used a slightly
+The learning rate used for the simulation was 0.001. Other values were also experimented.
+If the learning rate was too small, then the solution process was too slow. If the
+learning rate was too high then after making rapid initial progress initially, the
+solution abruptly collapsed (the accuracy dropped abruptly and drastically). A
+value of 0.005 showed good results too. Solution was consistently giving good
+accuracies quickly. However, the accuracies also showed oscillations of higher
+amplitude than with a leraning rate of 0.001.
+
+The number of epochs was chosen to be 20. While target accuracy was often achieved
+even for 10 epochs, it was less consistent. With 20 epochs the results were more
+consistently terminating with a validation accuracy greater than the target accuracy.
+
+The batch size was kept at 128. Larger sizes were also considered but no consistent
+improvements were observed by increasing the batch size.
+
+The optimization, the Adam optimizer was used with the default settings.
 
 #### 4. Describe the approach taken for finding a solution and getting the validation set accuracy to be at least 0.93. Include in the discussion the results on the training, validation and test sets and where in the code these were calculated. Your approach may have been an iterative process, in which case, outline the steps you took to get to the final solution and why you chose those steps. Perhaps your solution involved an already well known implementation or architecture. In this case, discuss why you think the architecture is suitable for the current problem.
 
