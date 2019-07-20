@@ -169,13 +169,13 @@ My final model consisted of the following layers:
 | Max pooling	      	| 2x2 stride,  outputs 14x14x10				|
 | Convolution 5x5	    |  1x1 stride, valid padding, outputs 10x10x25|
 | Max pooling	      	| 2x2 stride,  outputs 5x5x25 				|
+| RELU					|												|
 | Flatten		| 5x5x25=625 nodes        									|
 | Fully connected		| 120 nodes        									|
+| RELU					|												|
 | Fully connected		| 84 nodes        									|
-| Output		| 42        									|
-| Softmax				|         									|
-|						|												|
-|						|												|
+| RELU					|												|
+| Output		| 43 nodes       									|
 
 
 
@@ -217,16 +217,53 @@ If a well known architecture was chosen:
 * Why did you believe it would be relevant to the traffic sign application?
 * How does the final model's accuracy on the training, validation and test set provide evidence that the model is working well?
 
+The solution process involved experimenting with different architectures. Initially
+the LeNet architecture was chosen. The LeNet architecture was chosen because it is
+a tried and tested architecture for image data. This architecture was also used
+in the class lectures and was shown to be effective for a problem similar to the
+one used in this project (i.e., 32x32 input image). However, using the baseline
+LeNet architecture did not produce the desired validation accuracy. The performance
+of the baseline LeNet architecture is shown below:
+
+As seen above, the performance of the LeNet model on the validation data set did
+not produce the desired accuracy (0.93). Also it can be seen that the model is
+overfitting to the training data. In order to improve the accuracy of the
+model various parameters of the baseline LeNet model were adjusted. Some of these
+experiments and their outcomes are discussed below:
+
+* The number of nodes in the fully connected layers were increased. However, this did
+not improve
+
+* Dropout was added for several layers to reduce overfitting on the training data. However, while this succeeded in reducing the models performance on the training data, it did not
+succeed in improving the accuracy of validation and test data sets which also performed
+worse with dropout.
+
+number of filters in the first convolutional layer was increased from
+6 to 10 and the number of filters in the second convolutional model was increased
+from
+
 ### Test a Model on New Images
 
 #### 1. Choose five German traffic signs found on the web and provide them in the report. For each image, discuss what quality or qualities might be difficult to classify.
 
-Here are five German traffic signs that I found on the web:
+Here are five German traffic signs that I found on the [web](https://en.wikipedia.org/wiki/Road_signs_in_Germany):
 
-![alt text][image4] ![alt text][image5] ![alt text][image6]
-![alt text][image7] ![alt text][image8]
+<p align="center">
+<img src="web_images/children_crossing.png" width="19%" alt>
+<img src="web_images/wild_animals_crossing.png" width="19%" alt>
+<img src="web_images/traffic_signals.png" width="19%" alt>
+<img src="web_images/road_work.png" width="19%" alt>
+<img src="web_images/no_entry.png" width="19%" alt>
+</p>
+<p align="center">
+<em> Five german traffic signs
+</p>
 
-The first image might be difficult to classify because ...
+For the first, second and fourth images, the picture is not simple and this may make it hard
+to classify. The third image may get misclassified because there is a small gap between the
+circles and it is not obvious whether the low image resolution (32x32) would consistently
+allow the model to identify the shape. The final image (no entry) may be expected to be
+relatively easy to correctly classify.
 
 #### 2. Discuss the model's predictions on these new traffic signs and compare the results to predicting on the test set. At a minimum, discuss what the predictions were, the accuracy on these new predictions, and compare the accuracy to the accuracy on the test set (OPTIONAL: Discuss the results in more detail as described in the "Stand Out Suggestions" part of the rubric).
 
@@ -234,14 +271,14 @@ Here are the results of the prediction:
 
 | Image			        |     Prediction	        					|
 |:---------------------:|:---------------------------------------------:|
-| Stop Sign      		| Stop sign   									|
-| U-turn     			| U-turn 										|
-| Yield					| Yield											|
-| 100 km/h	      		| Bumpy Road					 				|
-| Slippery Road			| Slippery Road      							|
+| Children crossing      		| Children crossing   									|
+| Wild animals crossing      			| Wild animals crossing 										|
+| Traffic signals					| Traffic signals											|
+| Road work	      		| Road work					 				|
+| No entry			| No entry      							|
 
 
-The model was able to correctly guess 4 of the 5 traffic signs, which gives an accuracy of 80%. This compares favorably to the accuracy on the test set of ...
+The model was able to correctly guess all traffic signs. This compares favorably to the accuracy on the test set of which has an accuracy greater than 90%.
 
 #### 3. Describe how certain the model is when predicting on each of the five new images by looking at the softmax probabilities for each prediction. Provide the top 5 softmax probabilities for each image along with the sign type of each probability. (OPTIONAL: as described in the "Stand Out Suggestions" part of the rubric, visualizations can also be provided such as bar charts)
 
@@ -251,14 +288,48 @@ For the first image, the model is relatively sure that this is a stop sign (prob
 
 | Probability         	|     Prediction	        					|
 |:---------------------:|:---------------------------------------------:|
-| .60         			| Stop sign   									|
-| .20     				| U-turn 										|
-| .05					| Yield											|
-| .04	      			| Bumpy Road					 				|
-| .01				    | Slippery Road      							|
+| .576         			    | Children crossing   									|
+| .234     				      | Right of way at the next intersection	|
+| .083					        | Pedestrians											      |
+| .075	      			    | Beware of ice/snow					 				  |
+| .032				          | Roundabout mandatory      						|
+
+| Probability         	|     Prediction	        					|
+|:---------------------:|:---------------------------------------------:|
+| .576         			    | Children crossing   									|
+| .234     				      | Right of way at the next intersection	|
+| .083					        | Pedestrians											      |
+| .075	      			    | Beware of ice/snow					 				  |
+| .032				          | Roundabout mandatory      						|
 
 
 For the second image ...
+
+Wild animals crossing 0.7448
+Road work             0.0793
+Double curve          0.0659
+General caution       0.0604
+Slippery road         0.0497
+
+For the third image ...
+1. Probability(Traffic signals) = 0.4547
+2. Probability(General caution) = 0.3803
+3. Probability(Road narrows on the right) = 0.0613
+4. Probability(No vehicles) = 0.0574
+5. Probability(Pedestrians) = 0.0464
+
+For the fourth image ...
+1. Probability(Road work) = 0.4357
+2. Probability(Dangerous curve to the right) = 0.3871
+3. Probability(General caution) = 0.0853
+4. Probability(Right-of-way at the next intersection) = 0.0487
+5. Probability(Pedestrians) = 0.0432
+
+1. Probability(No entry) = 0.7365
+2. Probability(Traffic signals) = 0.0910
+3. Probability(Keep left) = 0.0694
+4. Probability(Turn right ahead) = 0.0521
+5. Probability(Roundabout mandatory) = 0.0509
 
 ### (Optional) Visualizing the Neural Network (See Step 4 of the Ipython notebook for more details)
 #### 1. Discuss the visual output of your trained network's feature maps. What characteristics did the neural network use to make classifications?
