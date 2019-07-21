@@ -113,7 +113,7 @@ augment_factor = [(max_hist // hist[i] - 1) for i in range(n_classes)]
 * For each training image, extra versions of the image were generated (depending on the
   augmentation factor) by adding random noise based on a specified mean and variance.
 
-The code snippet for adding noise is provided below:
+The [code snippet](https://stackoverflow.com/questions/22937589/how-to-add-noise-gaussian-salt-and-pepper-etc-to-image-in-python-with-opencv) for adding noise is provided below:
 ```python
 def add_noise(input_image, mean=0, var=10):
     sigma = var ** 0.5
