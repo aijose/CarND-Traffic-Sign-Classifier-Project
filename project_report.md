@@ -75,9 +75,6 @@ the number of training samples for each of the 43 classes.
 
 It is observed that the distribution of samples is similar for the train, validation and test datasets.
 
-
-![alt text][image1]
-
 ### Design and Test a Model Architecture
 
 #### 1. Describe how you preprocessed the image data. What techniques were chosen and why did you choose these techniques? Consider including images showing the output of each preprocessing technique. Pre-processing refers to techniques such as converting to grayscale, normalization, etc. (OPTIONAL: As described in the "Stand Out Suggestions" part of the rubric, if you generated additional data for training, describe why you decided to generate additional data, how you generated the data, and provide example images of the additional data. Then describe the characteristics of the augmented training set like number of images in the set, number of images for each class, etc.)
@@ -162,7 +159,7 @@ of the max samples to the number of samples for any class is no greater than 1.5
 My final model consisted of the following layers:
 
 | Layer         		|     Description	        					|
-|:---------------------:|:---------------------------------------------:|
+|-----------------------|-----------------------------------------------|
 | Input         		| 32x32x3 RGB image   							|
 | Convolution 5x5     	| 1x1 stride, valid padding, outputs 28x28x10 	|
 | RELU					|												|
@@ -173,6 +170,7 @@ My final model consisted of the following layers:
 | Flatten		| 5x5x25=625 nodes        									|
 | Fully connected		| 120 nodes        									|
 | RELU					|												|
+| Dropout					| keep_prob=0.8												|
 | Fully connected		| 84 nodes        									|
 | RELU					|												|
 | Output		| 43 nodes       									|
@@ -201,14 +199,13 @@ The optimization, the Adam optimizer was used with the default settings.
 #### 4. Describe the approach taken for finding a solution and getting the validation set accuracy to be at least 0.93. Include in the discussion the results on the training, validation and test sets and where in the code these were calculated. Your approach may have been an iterative process, in which case, outline the steps you took to get to the final solution and why you chose those steps. Perhaps your solution involved an already well known implementation or architecture. In this case, discuss why you think the architecture is suitable for the current problem.
 
 My final model results were:
-* training set accuracy of  0.98
-* validation set accuracy of 0.95
-* test set accuracy of 0.92
+* training set accuracy of  0.995
+* validation set accuracy of 0.941
+* test set accuracy of 0.922
 
 If an iterative approach was chosen:
 * What was the first architecture that was tried and why was it chosen?
 * What were some problems with the initial architecture?
-* How was the architecture adjusted and why was it adjusted? Typical adjustments could include choosing a different model architecture, adding or taking away layers (pooling, dropout, convolution, etc), using an activation function or changing the activation function. One common justification for adjusting an architecture would be due to overfitting or underfitting. A high accuracy on the training set but low accuracy on the validation set indicates over fitting; a low accuracy on both sets indicates under fitting.
 * Which parameters were tuned? How were they adjusted and why?
 * What are some of the important design choices and why were they chosen? For example, why might a convolution layer work well with this problem? How might a dropout layer help with creating a successful model?
 
@@ -225,6 +222,13 @@ one used in this project (i.e., 32x32 input image). However, using the baseline
 LeNet architecture did not produce the desired validation accuracy. The performance
 of the baseline LeNet architecture is shown below:
 
+<p align="center">
+<img src="report_images/performance_baseline_lenet.png" width="75%" alt>
+</p>
+<p align="center">
+<em> Performance on baseline LeNet architecture
+</p>
+
 As seen above, the performance of the LeNet model on the validation data set did
 not produce the desired accuracy (0.93). Also it can be seen that the model is
 overfitting to the training data. In order to improve the accuracy of the
@@ -238,9 +242,40 @@ not improve
 succeed in improving the accuracy of validation and test data sets which also performed
 worse with dropout.
 
-number of filters in the first convolutional layer was increased from
-6 to 10 and the number of filters in the second convolutional model was increased
-from
+In order to improve the performance on the validation and test data sets, number
+of filters in the first convolutional layer was increased from 6 to 10 and the
+number of filters in the second convolutional model was increased from 16 to 25.
+This resulted in a good improvement for all datasets, as shown below:
+
+<p align="center">
+<img src="report_images/performance_no_dropout.png" width="75%" alt>
+</p>
+<p align="center">
+<em> Performance on baseline LeNet architecture
+</p>
+
+The above configuration meets the target accuracy for the validation dataset. However,
+the model is clearly overfitting, as seen by the nearly 6-7% difference between
+the train and validation/test datasts. One way to reduce overfitting is to use
+dropout. Since dropout had previously failed to produce the desired accuracy when
+it was applied to several layers, this time dropout (with keep_prob=0.8) was applied
+only to the second fully connected layer. The performance on different datasets
+is shown below:
+
+<p align="center">
+<img src="report_images/performance_fc2dropout_0.8.png" width="75%" alt>
+</p>
+<p align="center">
+<em> Performance on baseline LeNet architecture
+</p>
+
+It is observed that the addition of dropout improves performance modestly, with
+accuracy increasing noticeably for both the validation and test datasets both in
+the early and later epochs. The target accuracy on the validation data was achieved
+as early as the 8th epoch, reaches a maximum of nearly 95% before finally settling
+at 94.1% at the end of the 15th epoch. Adjusting the dropout further (increase/decrease)
+did not however produce noticeably improvements in accuracy and therefore this
+configuration was chosen as the final configuration.
 
 ### Test a Model on New Images
 
@@ -263,7 +298,8 @@ For the first, second and fourth images, the picture is not simple and this may 
 to classify. The third image may get misclassified because there is a small gap between the
 circles and it is not obvious whether the low image resolution (32x32) would consistently
 allow the model to identify the shape. The final image (no entry) may be expected to be
-relatively easy to correctly classify.
+relatively easy to classify. All images were pre-processed by converting to grayscale
+and normalizing in the same manner as the training data (i.e., (image - 128)/128.0).
 
 #### 2. Discuss the model's predictions on these new traffic signs and compare the results to predicting on the test set. At a minimum, discuss what the predictions were, the accuracy on these new predictions, and compare the accuracy to the accuracy on the test set (OPTIONAL: Discuss the results in more detail as described in the "Stand Out Suggestions" part of the rubric).
 
@@ -284,7 +320,21 @@ The model was able to correctly guess all traffic signs. This compares favorably
 
 The code for making predictions on my final model is located in the 11th cell of the Ipython notebook.
 
-For the first image, the model is relatively sure that this is a stop sign (probability of 0.6), and the image does contain a stop sign. The top five soft max probabilities were
+For the first image, the model is moderately sure that this is a stop sign (probability of 0.576). The only other sign that comes close is "Right of way at the next intersection" which
+does bear some resemblance to the "Children crossing" traffic sign.
+
+<p align="left">
+<img src="web_images/children_crossing.png" width="19%" alt>
+</p>
+<p align="left">
+<em> "Children crossing" traffic sign
+</p>
+<p align="left">
+<img src="web_images/right_of_way_at_next_intersection.png" width="19%" alt>
+</p>
+<p align="left">
+<em> "Right of way at next intersection" traffic sign
+</p>
 
 | Probability         	|     Prediction	        					|
 |:---------------------:|:---------------------------------------------:|
@@ -294,42 +344,88 @@ For the first image, the model is relatively sure that this is a stop sign (prob
 | .075	      			    | Beware of ice/snow					 				  |
 | .032				          | Roundabout mandatory      						|
 
+
+For the second image the model is fairly confident about its prediction with nearly
+0.75 probability and less than 0.08 for all other possibilities.
+<p align="left">
+<img src="web_images/wild_animals_crossing.png" width="19%" alt>
+</p>
+<p align="left">
+<em> "Wild animals crossing" traffic sign
+</p>
+
 | Probability         	|     Prediction	        					|
 |:---------------------:|:---------------------------------------------:|
-| .576         			    | Children crossing   									|
-| .234     				      | Right of way at the next intersection	|
-| .083					        | Pedestrians											      |
-| .075	      			    | Beware of ice/snow					 				  |
-| .032				          | Roundabout mandatory      						|
+| 0.7448       			    | Wild animals crossing  |
+| 0.0793   		            | Road work              |
+| 0.0659			    | Double curve           |
+| 0.0604      			    | General caution        |
+| 0.0497			    | Slippery road          |
+
+For the third image the model is less than 50% sure that it corresponds to "Traffic signals", with "General caution" coming a close second. This is not surprising because both sign
+have most of the pixels in a straight line at the center and both have at least one circle.
+
+<p align="left">
+<img src="web_images/traffic_signals.png" width="19%" alt>
+</p>
+<p align="left">
+<em> Five "Traffic signals" traffic sign
+</p>
+<p align="left">
+<img src="web_images/general_caution.png" width="19%" alt>
+</p>
+<p align="left">
+<em> Five "General caution" traffic sign
+</p>
+
+| Probability         	|     Prediction	        					|
+|:---------------------:|:---------------------------------------------:|
+| 0.4547      			    | Traffic signals                  |
+| 0.3803    		            | General caution                  |
+| 0.0613 			    | Road narrows on the right        |
+| 0.0574       			    | No vehicles                      |
+| 0.0464 			    | Pedestrians                      |
+
+For the fourth image, again the model is barely certain about its prediction (~43%) with dangerous curve to the right coming a very close second (38.7%). Again there are some
+similarities between the two images.
+<p align="left">
+<img src="web_images/road_work.png" width="19%" alt>
+</p>
+<p align="left">
+<em> "Road work" traffic sign
+</p>
+<p align="left">
+<img src="web_images/dangerous_curve_to_the_right.png" width="19%" alt>
+</p>
+<p align="left">
+<em> "Road work" traffic sign
+</p>
+
+| Probability         	|     Prediction	        					|
+|:---------------------:|:---------------------------------------------:|
+| 0.4357         		    | Road work                             |
+| 0.3871     		            | Dangerous curve to the right          |
+| 0.0853			    | General caution                       |
+| 0.0487	      		    | Right-of-way at the next intersection |
+| 0.0432			    | Pedestrians                           |
 
 
-For the second image ...
+For the fifth image the model is fairly certain that it is a "No entry" sign, with
+no other sign having more than 10% probability.
+<p align="left">
+<img src="web_images/no_entry.png" width="19%" alt>
+</p>
+<p align="left">
+<em> "No entry" traffic sign
+</p>
 
-Wild animals crossing 0.7448
-Road work             0.0793
-Double curve          0.0659
-General caution       0.0604
-Slippery road         0.0497
-
-For the third image ...
-1. Probability(Traffic signals) = 0.4547
-2. Probability(General caution) = 0.3803
-3. Probability(Road narrows on the right) = 0.0613
-4. Probability(No vehicles) = 0.0574
-5. Probability(Pedestrians) = 0.0464
-
-For the fourth image ...
-1. Probability(Road work) = 0.4357
-2. Probability(Dangerous curve to the right) = 0.3871
-3. Probability(General caution) = 0.0853
-4. Probability(Right-of-way at the next intersection) = 0.0487
-5. Probability(Pedestrians) = 0.0432
-
-1. Probability(No entry) = 0.7365
-2. Probability(Traffic signals) = 0.0910
-3. Probability(Keep left) = 0.0694
-4. Probability(Turn right ahead) = 0.0521
-5. Probability(Roundabout mandatory) = 0.0509
+| Probability         	|     Prediction	        					|
+|:---------------------:|:---------------------------------------------:|
+| 0.7365         		    | No entry             |
+| 0.0910     		            | Traffic signals      |
+| 0.0694			    | Keep left            |
+| 0.0521	      		    | Turn right ahead     |
+| 0.0509			    | Roundabout mandatory |
 
 ### (Optional) Visualizing the Neural Network (See Step 4 of the Ipython notebook for more details)
 #### 1. Discuss the visual output of your trained network's feature maps. What characteristics did the neural network use to make classifications?
